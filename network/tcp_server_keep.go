@@ -164,6 +164,7 @@ func waitForSignals(addr string, ln net.Listener) {
 					continue
 				}
 				fmt.Printf("Forked child子分支Pid: %v.\n", p.Pid)
+				ln.Close()
 			case syscall.SIGUSR2:
 				// fork一个子分支进程.
 				p, err := forkChild(addr, ln)
@@ -174,6 +175,9 @@ func waitForSignals(addr string, ln net.Listener) {
 
 				// 打印这个PID，等待更多信号
 				fmt.Printf("Forked child %v.\n", p.Pid)
+			case syscall.SIGINT, syscall.SIGQUIT:
+				// 创建一个上下文，当关机时，超过5秒算是超时。
+				ln.Close()
 			}
 		}
 	}
