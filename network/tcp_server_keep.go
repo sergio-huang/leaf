@@ -140,7 +140,7 @@ func forkChild(addr string, ln net.Listener) (*os.Process, error) {
 	return p, nil
 }
 
-func waitForSignals(addr string, ln net.Listener) {
+func waitForSignals(addr string, ln net.Listener, server *TCPServer) {
 	// 到底用多少缓冲合适呢？需要根据自己的服务大小？我觉得不需要，于是用1
 	//signalCh := make(chan os.Signal, 1024)
 	signalCh := make(chan os.Signal, 1)
@@ -164,7 +164,7 @@ func waitForSignals(addr string, ln net.Listener) {
 					continue
 				}
 				fmt.Printf("Forked child子分支Pid: %v.\n", p.Pid)
-				ln.Close()
+				server.Close()
 			case syscall.SIGUSR2:
 				// fork一个子分支进程.
 				p, err := forkChild(addr, ln)
@@ -177,8 +177,8 @@ func waitForSignals(addr string, ln net.Listener) {
 				fmt.Printf("Forked child %v.\n", p.Pid)
 			case syscall.SIGINT, syscall.SIGQUIT:
 				// 创建一个上下文，当关机时，超过5秒算是超时。
-				ln.Close()
 				fmt.Printf("SIGINT.\n")
+				server.Close()
 			}
 		}
 	}
