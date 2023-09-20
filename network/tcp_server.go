@@ -5,6 +5,8 @@ import (
 	"net"
 	"sync"
 	"time"
+	"fmt"
+	"os"
 )
 
 type TCPServer struct {
@@ -29,7 +31,7 @@ type TCPServer struct {
 func (server *TCPServer) Start() {
 	server.init()
 	go server.run()
-	err = waitForSignals(server.Addr, server.ln)
+	err := waitForSignals(server.Addr, server.ln)
 	if err != nil {
 		fmt.Printf("Exiting: %v\n", err)
 		return
