@@ -178,6 +178,7 @@ func waitForSignals(addr string, ln net.Listener) {
 			case syscall.SIGINT, syscall.SIGQUIT:
 				// 创建一个上下文，当关机时，超过5秒算是超时。
 				ln.Close()
+				fmt.Printf("SIGINT.\n")
 			}
 		}
 	}
