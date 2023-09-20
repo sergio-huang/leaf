@@ -31,7 +31,7 @@ type TCPServer struct {
 func (server *TCPServer) Start() {
 	server.init()
 	go server.run()
-	waitForSignals(server.Addr, server.ln, server)
+	waitForSignals(server.Addr, server.ln)
 	fmt.Printf("Exiting.\n")
 }
 
