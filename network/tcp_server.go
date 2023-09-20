@@ -31,25 +31,21 @@ type TCPServer struct {
 func (server *TCPServer) Start() {
 	server.init()
 	go server.run()
-	err := waitForSignals(server.Addr, server.ln)
-	if err != nil {
-		fmt.Printf("Exiting: %v\n", err)
-		return
-	}
+	waitForSignals(server.Addr, server.ln)
 	fmt.Printf("Exiting.\n")
 }
 
 func (server *TCPServer) init() {
 	ln, err := createOrImportListener(server.Addr)
 	if err != nil {
-		fmt.Printf("Unable to create or import a listener: %v.\n", err)
+		log.Fatal("%v", err)
 		// 系统退出
 		os.Exit(1)
 	}
-	ln, err := net.Listen("tcp", server.Addr)
-	if err != nil {
-		log.Fatal("%v", err)
-	}
+	// ln, err = net.Listen("tcp", server.Addr)
+	// if err != nil {
+	// 	log.Fatal("%v", err)
+	// }
 
 	if server.MaxConnNum <= 0 {
 		server.MaxConnNum = 100
