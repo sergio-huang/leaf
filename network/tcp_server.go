@@ -1,11 +1,14 @@
 package network
 
 import (
-	"github.com/name5566/leaf/log"
 	"net"
 	"sync"
 	"time"
+
+	"github.com/name5566/leaf/log"
 )
+
+var noDeadline time.Time
 
 type TCPServer struct {
 	Addr            string
@@ -86,11 +89,12 @@ func (server *TCPServer) run() {
 		log.Debug(conn.RemoteAddr().String())
 		header := make([]byte, 3)
 		conn.SetReadDeadline(time.Now().Add(3 * time.Second))
-		_, err := conn.Read(header)
+		_, err = conn.Read(header)
 		if err != nil || string(header) != "{{{" {
 			conn.Close()
 			continue
 		}
+		conn.SetReadDeadline(noDeadline)
 		server.mutexConns.Lock()
 		if len(server.conns) >= server.MaxConnNum {
 			server.mutexConns.Unlock()
