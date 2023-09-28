@@ -5,8 +5,6 @@ import (
 	"net"
 	"sync"
 	"time"
-	"fmt"
-	"os"
 )
 
 type TCPServer struct {
@@ -31,21 +29,13 @@ type TCPServer struct {
 func (server *TCPServer) Start() {
 	server.init()
 	go server.run()
-	waitForSignals(server.Addr, server.ln)
-	fmt.Printf("Exiting.\n")
 }
 
 func (server *TCPServer) init() {
-	ln, err := createOrImportListener(server.Addr)
+	ln, err := net.Listen("tcp", server.Addr)
 	if err != nil {
 		log.Fatal("%v", err)
-		// 系统退出
-		os.Exit(1)
 	}
-	// ln, err = net.Listen("tcp", server.Addr)
-	// if err != nil {
-	// 	log.Fatal("%v", err)
-	// }
 
 	if server.MaxConnNum <= 0 {
 		server.MaxConnNum = 100
