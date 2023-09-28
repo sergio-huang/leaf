@@ -1,10 +1,11 @@
 package network
 
 import (
-	"github.com/name5566/leaf/log"
 	"net"
 	"sync"
 	"time"
+
+	"github.com/name5566/leaf/log"
 )
 
 type TCPClient struct {
@@ -73,9 +74,16 @@ func (client *TCPClient) dial() net.Conn {
 	for {
 		conn, err := net.Dial("tcp", client.Addr)
 		if err == nil || client.closeFlag {
+			log.Debug(conn.RemoteAddr().String())
+			header := make([]byte, 3)
+			conn.SetReadDeadline(time.Now().Add(3 * time.Second))
+			_, err := conn.Read(header)
+			if err != nil || string(header) != "{{{" {
+				conn.Close()
+				continue
+			}
 			return conn
 		}
-
 		log.Release("connect to %v error: %v", client.Addr, err)
 		time.Sleep(client.ConnectInterval)
 		continue
