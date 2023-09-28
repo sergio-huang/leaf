@@ -83,7 +83,14 @@ func (server *TCPServer) run() {
 			return
 		}
 		tempDelay = 0
-
+		log.Debug(conn.RemoteAddr().String())
+		header := make([]byte, 3)
+		conn.SetReadDeadline(time.Now().Add(3 * time.Second))
+		_, err := conn.Read(header)
+		if err != nil || string(header) != "{{{" {
+			conn.Close()
+			continue
+		}
 		server.mutexConns.Lock()
 		if len(server.conns) >= server.MaxConnNum {
 			server.mutexConns.Unlock()
